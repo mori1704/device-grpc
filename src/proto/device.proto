@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package pbs;
+option go_package = "./pbs/pbs";
+
+message PingRequest {
+  string ping = 1;
+}
+
+message PingResponse {
+  string pong = 1;
+}
+
+message StartDeviceRequest {
+  string channelId = 1;
+  string jid = 2;
+}
+
+message StartDeviceResponse {
+  string result = 1;
+}
+
+service Device {
+  rpc StartDevice(StartDeviceRequest) returns (StartDeviceResponse);
+  rpc Ping(PingRequest) returns (PingResponse);
+}
