@@ -20,7 +20,16 @@ message StartDeviceResponse {
   string result = 1;
 }
 
+message ListDeviceGroupsRequest {
+  string channelId = 1;
+}
+
+message ListDeviceGroupsResponse {
+  bytes groups = 1;
+}
+
 service Device {
   rpc StartDevice(StartDeviceRequest) returns (StartDeviceResponse);
   rpc Ping(PingRequest) returns (PingResponse);
+  rpc ListDeviceGroups(ListDeviceGroupsRequest) returns (ListDeviceGroupsResponse);
 }

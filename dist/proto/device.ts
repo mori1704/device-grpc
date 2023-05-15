@@ -32,6 +32,14 @@ export interface StartDeviceResponse {
   result: string;
 }
 
+export interface ListDeviceGroupsRequest {
+  channelId: string;
+}
+
+export interface ListDeviceGroupsResponse {
+  groups: Uint8Array;
+}
+
 function createBasePingRequest(): PingRequest {
   return { ping: "" };
 }
@@ -271,6 +279,119 @@ export const StartDeviceResponse = {
   },
 };
 
+function createBaseListDeviceGroupsRequest(): ListDeviceGroupsRequest {
+  return { channelId: "" };
+}
+
+export const ListDeviceGroupsRequest = {
+  encode(message: ListDeviceGroupsRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.channelId !== "") {
+      writer.uint32(10).string(message.channelId);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): ListDeviceGroupsRequest {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseListDeviceGroupsRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.channelId = reader.string();
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): ListDeviceGroupsRequest {
+    return { channelId: isSet(object.channelId) ? String(object.channelId) : "" };
+  },
+
+  toJSON(message: ListDeviceGroupsRequest): unknown {
+    const obj: any = {};
+    message.channelId !== undefined && (obj.channelId = message.channelId);
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<ListDeviceGroupsRequest>, I>>(base?: I): ListDeviceGroupsRequest {
+    return ListDeviceGroupsRequest.fromPartial(base ?? {});
+  },
+
+  fromPartial<I extends Exact<DeepPartial<ListDeviceGroupsRequest>, I>>(object: I): ListDeviceGroupsRequest {
+    const message = createBaseListDeviceGroupsRequest();
+    message.channelId = object.channelId ?? "";
+    return message;
+  },
+};
+
+function createBaseListDeviceGroupsResponse(): ListDeviceGroupsResponse {
+  return { groups: new Uint8Array() };
+}
+
+export const ListDeviceGroupsResponse = {
+  encode(message: ListDeviceGroupsResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.groups.length !== 0) {
+      writer.uint32(10).bytes(message.groups);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): ListDeviceGroupsResponse {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseListDeviceGroupsResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.groups = reader.bytes();
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): ListDeviceGroupsResponse {
+    return { groups: isSet(object.groups) ? bytesFromBase64(object.groups) : new Uint8Array() };
+  },
+
+  toJSON(message: ListDeviceGroupsResponse): unknown {
+    const obj: any = {};
+    message.groups !== undefined &&
+      (obj.groups = base64FromBytes(message.groups !== undefined ? message.groups : new Uint8Array()));
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<ListDeviceGroupsResponse>, I>>(base?: I): ListDeviceGroupsResponse {
+    return ListDeviceGroupsResponse.fromPartial(base ?? {});
+  },
+
+  fromPartial<I extends Exact<DeepPartial<ListDeviceGroupsResponse>, I>>(object: I): ListDeviceGroupsResponse {
+    const message = createBaseListDeviceGroupsResponse();
+    message.groups = object.groups ?? new Uint8Array();
+    return message;
+  },
+};
+
 export type DeviceService = typeof DeviceService;
 export const DeviceService = {
   startDevice: {
@@ -291,11 +412,22 @@ export const DeviceService = {
     responseSerialize: (value: PingResponse) => Buffer.from(PingResponse.encode(value).finish()),
     responseDeserialize: (value: Buffer) => PingResponse.decode(value),
   },
+  listDeviceGroups: {
+    path: "/pbs.Device/ListDeviceGroups",
+    requestStream: false,
+    responseStream: false,
+    requestSerialize: (value: ListDeviceGroupsRequest) => Buffer.from(ListDeviceGroupsRequest.encode(value).finish()),
+    requestDeserialize: (value: Buffer) => ListDeviceGroupsRequest.decode(value),
+    responseSerialize: (value: ListDeviceGroupsResponse) =>
+      Buffer.from(ListDeviceGroupsResponse.encode(value).finish()),
+    responseDeserialize: (value: Buffer) => ListDeviceGroupsResponse.decode(value),
+  },
 } as const;
 
 export interface DeviceServer extends UntypedServiceImplementation {
   startDevice: handleUnaryCall<StartDeviceRequest, StartDeviceResponse>;
   ping: handleUnaryCall<PingRequest, PingResponse>;
+  listDeviceGroups: handleUnaryCall<ListDeviceGroupsRequest, ListDeviceGroupsResponse>;
 }
 
 export interface DeviceClient extends Client {
@@ -326,12 +458,71 @@ export interface DeviceClient extends Client {
     options: Partial<CallOptions>,
     callback: (error: ServiceError | null, response: PingResponse) => void,
   ): ClientUnaryCall;
+  listDeviceGroups(
+    request: ListDeviceGroupsRequest,
+    callback: (error: ServiceError | null, response: ListDeviceGroupsResponse) => void,
+  ): ClientUnaryCall;
+  listDeviceGroups(
+    request: ListDeviceGroupsRequest,
+    metadata: Metadata,
+    callback: (error: ServiceError | null, response: ListDeviceGroupsResponse) => void,
+  ): ClientUnaryCall;
+  listDeviceGroups(
+    request: ListDeviceGroupsRequest,
+    metadata: Metadata,
+    options: Partial<CallOptions>,
+    callback: (error: ServiceError | null, response: ListDeviceGroupsResponse) => void,
+  ): ClientUnaryCall;
 }
 
 export const DeviceClient = makeGenericClientConstructor(DeviceService, "pbs.Device") as unknown as {
   new (address: string, credentials: ChannelCredentials, options?: Partial<ClientOptions>): DeviceClient;
   service: typeof DeviceService;
 };
+
+declare var self: any | undefined;
+declare var window: any | undefined;
+declare var global: any | undefined;
+var tsProtoGlobalThis: any = (() => {
+  if (typeof globalThis !== "undefined") {
+    return globalThis;
+  }
+  if (typeof self !== "undefined") {
+    return self;
+  }
+  if (typeof window !== "undefined") {
+    return window;
+  }
+  if (typeof global !== "undefined") {
+    return global;
+  }
+  throw "Unable to locate global object";
+})();
+
+function bytesFromBase64(b64: string): Uint8Array {
+  if (tsProtoGlobalThis.Buffer) {
+    return Uint8Array.from(tsProtoGlobalThis.Buffer.from(b64, "base64"));
+  } else {
+    const bin = tsProtoGlobalThis.atob(b64);
+    const arr = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; ++i) {
+      arr[i] = bin.charCodeAt(i);
+    }
+    return arr;
+  }
+}
+
+function base64FromBytes(arr: Uint8Array): string {
+  if (tsProtoGlobalThis.Buffer) {
+    return tsProtoGlobalThis.Buffer.from(arr).toString("base64");
+  } else {
+    const bin: string[] = [];
+    arr.forEach((byte) => {
+      bin.push(String.fromCharCode(byte));
+    });
+    return tsProtoGlobalThis.btoa(bin.join(""));
+  }
+}
 
 type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
 

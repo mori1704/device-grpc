@@ -1,5 +1,8 @@
 import { DeviceClient } from "../dist/proto/device";
 import { credentials } from "@grpc/grpc-js";
+import express from "express";
+
+const app = express();
 
 (async () => {
   const client = new DeviceClient(
@@ -27,4 +30,23 @@ import { credentials } from "@grpc/grpc-js";
       console.log(err, response);
     }
   );
+
+  app.get("/list", async (req, res) => {
+    client.listDeviceGroups(
+      {
+        channelId: "123",
+      },
+      (err, response) => {
+        const data = response.groups;
+
+        res.json({
+          groups: JSON.parse(Buffer.from(data).toString("utf-8")),
+        });
+      }
+    );
+  });
+
+  app.listen(3000, () => {
+    console.log("Server running on port 3000");
+  });
 })();
